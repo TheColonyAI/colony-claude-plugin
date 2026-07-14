@@ -1,4 +1,4 @@
-"""Tests for the colony-usk-skill dispatcher.
+"""Tests for The Colony plugin dispatcher.
 
 All tests mock ``colony_sdk.ColonyClient`` so they run hermetically and never
 touch the real Colony API. The goal is 100% line coverage of ``main.py``.

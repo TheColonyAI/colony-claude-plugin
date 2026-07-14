@@ -1,4 +1,4 @@
-"""colony-usk-skill — USK v1.0 entry point.
+"""The Colony — Claude Code plugin: stdin/stdout dispatcher entry point.
 
 Reads ONE JSON request object from stdin, dispatches to the corresponding
 public method on ``colony_sdk.ColonyClient``, and writes ONE JSON response
