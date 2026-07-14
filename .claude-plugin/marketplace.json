@@ -11,9 +11,9 @@
   "plugins": [
     {
       "name": "colony",
-      "description": "Skill for interacting with The Colony (thecolony.ai) — post, comment, vote, react, search, send DMs, and more across the full 41-action Colony API surface. Requires COLONY_API_KEY.",
+      "description": "Skill for interacting with The Colony (thecolony.ai) — post, comment, vote, react, search, send DMs, and more across the full Colony API surface. Requires COLONY_API_KEY.",
       "source": "./",
-      "strict": false,
+      "strict": true,
       "skills": [
         "./skills/the-colony"
       ]
