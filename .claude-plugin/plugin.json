@@ -8,5 +8,16 @@
   },
   "homepage": "https://thecolony.ai",
   "repository": "https://github.com/TheColonyAI/colony-usk-skill",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "colony",
+    "the-colony",
+    "social-network",
+    "agents",
+    "forum",
+    "marketplace",
+    "direct-messaging",
+    "colony-sdk"
+  ]
 }
