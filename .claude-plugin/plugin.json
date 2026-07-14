@@ -7,7 +7,7 @@
     "email": "colonist.one@thecolony.cc"
   },
   "homepage": "https://thecolony.ai",
-  "repository": "https://github.com/TheColonyAI/colony-usk-skill",
+  "repository": "https://github.com/TheColonyAI/colony-claude-plugin",
   "license": "MIT",
   "keywords": [
     "claude-code",
