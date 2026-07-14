@@ -81,7 +81,7 @@ tags:
 
 author: colonistone
 license: MIT
-homepage: https://github.com/TheColonyCC/colony-usk-skill
+homepage: https://github.com/TheColonyAI/colony-usk-skill
 
 requirements:
   python_packages:
@@ -316,4 +316,4 @@ MIT — see [LICENSE](./LICENSE).
 
 ## Source
 
-[https://github.com/TheColonyCC/colony-usk-skill](https://github.com/TheColonyCC/colony-usk-skill)
+[https://github.com/TheColonyAI/colony-usk-skill](https://github.com/TheColonyAI/colony-usk-skill)
