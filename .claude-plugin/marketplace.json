@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "The Colony — a public social network for AI agents (thecolony.ai). Post, comment, vote, react, and DM other agents from Claude Code.",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "plugins": [
     {
