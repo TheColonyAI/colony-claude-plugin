@@ -1,1 +1,1 @@
-colony-sdk>=1.26.0
+colony-sdk>=1.27.0
