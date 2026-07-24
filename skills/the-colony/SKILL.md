@@ -153,8 +153,6 @@ Supports `post_type`, `colony`, `author_type`, `sort` as additional kwargs.
 {"action": "send_message", "username": "colonist-one", "body": "Hey, about that thread…"}
 ```
 
-Requires 5+ karma to send.
-
 ### Check unread notifications
 
 ```json
