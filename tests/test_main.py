@@ -101,7 +101,8 @@ def test_action_map_is_populated_and_excludes_state_helpers():
         "create_webhook",
         "update_webhook",
         "delete_webhook",
-        "register",
+        "register_begin",
+        "register_confirm",
         "rotate_key",
     ]
     for name in expected:
@@ -111,8 +112,15 @@ def test_action_map_is_populated_and_excludes_state_helpers():
     for name in main.ACTIONS:
         assert not name.startswith("_")
 
-    # Register must be in the static-method set
-    assert "register" in main.STATIC_METHODS
+    # Both registration steps must be in the static-method set. Anything
+    # outside it demands COLONY_API_KEY, which a registering agent cannot
+    # have — that is exactly how one-step ``register`` left this plugin
+    # unable to register anyone for months.
+    assert "register_begin" in main.STATIC_METHODS
+    assert "register_confirm" in main.STATIC_METHODS
+    # And the dead one must not linger.
+    assert "register" not in main.STATIC_METHODS
+    assert "register" not in main.ACTIONS
 
 
 def test_build_action_map_skips_non_callables_and_dunders():
@@ -251,16 +259,18 @@ def test_missing_api_key_for_authenticated_action():
     assert resp["error"]["code"] == "MISSING_API_KEY"
 
 
-def test_register_does_not_require_api_key():
-    # register is a static method — no client needed.
-    fake_register = MagicMock(return_value={"id": "abc", "api_key": "col_fresh"})
+def test_register_begin_does_not_require_api_key():
+    """The regression that mattered: a registering agent has no api_key yet,
+    so demanding one makes registration impossible. This asserted the old
+    one-step ``register`` and so kept passing while the real flow was
+    broken."""
+    fake = MagicMock(return_value={"id": "abc", "api_key": "col_fresh", "claim_token": "rct_x"})
 
-    # Patch the SDK's register method so it doesn't hit the network.
-    with patch.object(main.ColonyClient, "register", fake_register), patch.dict("os.environ", {}, clear=True):
+    with patch.object(main.ColonyClient, "register_begin", fake), patch.dict("os.environ", {}, clear=True):
         code, resp = run_main(
             json.dumps(
                 {
-                    "action": "register",
+                    "action": "register_begin",
                     "username": "my-agent",
                     "display_name": "My Agent",
                     "bio": "A new agent",
@@ -269,11 +279,47 @@ def test_register_does_not_require_api_key():
         )
     assert code == 0
     assert resp["status"] == "ok"
-    assert resp["result"] == {"id": "abc", "api_key": "col_fresh"}
-    fake_register.assert_called_once_with(
+    assert resp["result"]["api_key"] == "col_fresh"
+    fake.assert_called_once_with(
         username="my-agent",
         display_name="My Agent",
         bio="A new agent",
+    )
+
+
+def test_register_confirm_does_not_require_api_key():
+    """Step 2's credential is the claim_token, not the api_key."""
+    fake = MagicMock(return_value={"status": "active"})
+
+    with patch.object(main.ColonyClient, "register_confirm", fake), patch.dict("os.environ", {}, clear=True):
+        code, resp = run_main(
+            json.dumps(
+                {
+                    "action": "register_confirm",
+                    "claim_token": "rct_x",
+                    "key_fingerprint": "abc123",
+                }
+            )
+        )
+    assert code == 0
+    assert resp["status"] == "ok"
+    fake.assert_called_once_with(claim_token="rct_x", key_fingerprint="abc123")
+
+
+def test_the_skill_doc_does_not_teach_a_nonexistent_action():
+    """SKILL.md is the surface agents actually read, and nothing else in this
+    suite looks at it. It documented ``{"action": "register"}`` for months
+    after the SDK dropped it -- every follower got UNKNOWN_ACTION."""
+    import pathlib
+    import re
+
+    doc = pathlib.Path(__file__).resolve().parents[1] / "skills" / "the-colony" / "SKILL.md"
+    named = set(re.findall(r'"action"\s*:\s*"([a-z_0-9]+)"', doc.read_text()))
+    assert named, "no actions found in SKILL.md -- the scan broke, not the doc"
+    unknown = sorted(a for a in named if a not in main.ACTIONS)
+    assert not unknown, (
+        f"SKILL.md documents action(s) the SDK does not expose: {unknown}. "
+        "Every agent following that example gets UNKNOWN_ACTION."
     )
 
 
