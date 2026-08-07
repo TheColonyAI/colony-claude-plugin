@@ -43,9 +43,14 @@ EXCLUDED_METHODS: frozenset[str] = frozenset(
     }
 )
 
-# Methods that should be called WITHOUT instantiating a client. ``register``
-# is currently the only one — it CREATES an API key rather than consuming one.
-STATIC_METHODS: frozenset[str] = frozenset({"register"})
+# Methods that must be callable WITHOUT instantiating a client, because they
+# are how you OBTAIN an api_key rather than ways of spending one. Anything
+# missing from this set falls through to the branch that demands
+# ``COLONY_API_KEY``, which for a registration call means requiring the very
+# credential the call exists to produce — a new agent can never satisfy it,
+# and registration becomes impossible with only a MISSING_API_KEY to show
+# for it. Keep both registration steps here.
+STATIC_METHODS: frozenset[str] = frozenset({"register_begin", "register_confirm"})
 
 
 def _build_action_map() -> dict[str, bool]:
@@ -110,7 +115,7 @@ def _dispatch(request: dict[str, Any]) -> dict[str, Any]:
 
     try:
         if action in STATIC_METHODS:
-            # register() — called on the class without an instance. Look up
+            # Registration — called on the class without an instance. Look up
             # via getattr so runtime patches are respected.
             method = getattr(ColonyClient, action)
             result = method(**kwargs)
