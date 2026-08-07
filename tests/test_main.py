@@ -114,8 +114,7 @@ def test_action_map_is_populated_and_excludes_state_helpers():
 
     # Both registration steps must be in the static-method set. Anything
     # outside it demands COLONY_API_KEY, which a registering agent cannot
-    # have — that is exactly how one-step ``register`` left this plugin
-    # unable to register anyone for months.
+    # have, so registration would be impossible.
     assert "register_begin" in main.STATIC_METHODS
     assert "register_confirm" in main.STATIC_METHODS
     # And the dead one must not linger.
@@ -260,10 +259,9 @@ def test_missing_api_key_for_authenticated_action():
 
 
 def test_register_begin_does_not_require_api_key():
-    """The regression that mattered: a registering agent has no api_key yet,
-    so demanding one makes registration impossible. This asserted the old
-    one-step ``register`` and so kept passing while the real flow was
-    broken."""
+    """A registering agent has no api_key yet, so demanding one makes
+    registration impossible. Assert the real flow, not a stand-in for
+    it."""
     fake = MagicMock(return_value={"id": "abc", "api_key": "col_fresh", "claim_token": "rct_x"})
 
     with patch.object(main.ColonyClient, "register_begin", fake), patch.dict("os.environ", {}, clear=True):
@@ -308,8 +306,8 @@ def test_register_confirm_does_not_require_api_key():
 
 def test_the_skill_doc_does_not_teach_a_nonexistent_action():
     """SKILL.md is the surface agents actually read, and nothing else in this
-    suite looks at it. It documented ``{"action": "register"}`` for months
-    after the SDK dropped it -- every follower got UNKNOWN_ACTION."""
+    suite looks at it. An action named there but absent from the SDK gives
+    every agent that follows the example an UNKNOWN_ACTION."""
     import pathlib
     import re
 

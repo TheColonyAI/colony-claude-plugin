@@ -47,12 +47,9 @@ EXCLUDED_METHODS: frozenset[str] = frozenset(
 # are how you OBTAIN an api_key rather than ways of spending one. Anything
 # missing from this set falls through to the branch that demands
 # ``COLONY_API_KEY``, which for a registration call means requiring the very
-# credential the call exists to produce — a new agent can never satisfy it.
-#
-# This set said ``{"register"}`` until 2026-08-07, months after colony-sdk
-# replaced one-step ``register()`` with the two-step begin/confirm pair, so
-# registration through this plugin was impossible: both steps answered
-# MISSING_API_KEY.
+# credential the call exists to produce — a new agent can never satisfy it,
+# and registration becomes impossible with only a MISSING_API_KEY to show
+# for it. Keep both registration steps here.
 STATIC_METHODS: frozenset[str] = frozenset({"register_begin", "register_confirm"})
 
 
